@@ -3,9 +3,10 @@ require 'rails_helper'
 RSpec.describe 'Bookings API' do
   # Initialize the test data
   let!(:user) { create(:user) }
-  let!(:hotel) { create(:hotel) }
+  let!(:hotel) { create(:hotel, created_by: user.id) }
   let!(:bookings) { create_list(:booking, 20, hotel_id: hotel.id, user_id: user.id) }
   let(:hotel_id) { hotel.id }
+  let(:user_id) { user.id }
   let(:id) { bookings.first.id }
 
   # Test suite for GET /hotels/:hotel_id/bookings
@@ -64,7 +65,7 @@ RSpec.describe 'Bookings API' do
 
   # Test suite for PUT /hotels/:hotel_id/bookings
   describe 'POST /hotels/:hotel_id/bookings' do
-    let(:valid_attributes) { { booking_reference: 'Ref:1234', payment_status: false } }
+    let(:valid_attributes) { { user_id: user_id, booking_reference: 'Ref:1234', payment_status: false } }
 
     context 'when request attributes are valid' do
       before { post "/hotels/#{hotel_id}/bookings", params: valid_attributes }
@@ -82,7 +83,7 @@ RSpec.describe 'Bookings API' do
       end
 
       it 'returns a failure message' do
-        expect(response.body).to match(/Validation failed: Booking reference can't be blank/)
+        expect(response.body).to match(/Validation failed: User must exist, Booking reference can't be blank/)
       end
     end
   end

@@ -3,7 +3,8 @@ require 'rails_helper'
 
 RSpec.describe 'Hotels API', type: :request do
   # initialize test data
-  let!(:hotels) { create_list(:hotel, 10) }
+  let!(:user) { create(:user) }
+  let!(:hotels) { create_list(:hotel, 10, created_by: user.id) }
   let(:hotel_id) { hotels.first.id }
 
   # Test suite for GET /hotels
