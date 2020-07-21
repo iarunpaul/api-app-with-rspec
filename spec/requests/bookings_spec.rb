@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe 'Bookings API' do
   # Initialize the test data
+  let!(:user) { create(:user) }
   let!(:hotel) { create(:hotel) }
-  let!(:bookings) { create_list(:booking, 20, hotel_id: hotel.id) }
+  let!(:bookings) { create_list(:booking, 20, hotel_id: hotel.id, user_id: user.id) }
   let(:hotel_id) { hotel.id }
   let(:id) { bookings.first.id }
 

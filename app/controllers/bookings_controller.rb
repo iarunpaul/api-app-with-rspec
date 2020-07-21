@@ -33,7 +33,7 @@ class BookingsController < ApplicationController
   private
 
   def booking_params
-    params.permit(:booking_reference, :payment_status)
+    params.permit(:booking_reference, :payment_status, :user_id)
   end
 
   def set_hotel
