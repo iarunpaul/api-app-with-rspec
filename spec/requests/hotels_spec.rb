@@ -6,11 +6,14 @@ RSpec.describe 'Hotels API', type: :request do
   let!(:user) { create(:user) }
   let!(:hotels) { create_list(:hotel, 10, created_by: user.id) }
   let(:hotel_id) { hotels.first.id }
+  let!(:booking) { create_list(:booking, 10, user_id: user.id, hotel_id: hotel_id) }
+  # authorize request
+  let(:headers) { valid_headers }
 
   # Test suite for GET /hotels
   describe 'GET /hotels' do
     # make HTTP get request before each example
-    before { get '/hotels' }
+    before { get '/hotels', params: {}, headers: headers }
 
     it 'returns hotels' do
       # Note `json` is a custom helper to parse JSON responses
@@ -25,7 +28,7 @@ RSpec.describe 'Hotels API', type: :request do
 
   # Test suite for GET /hotels/:id
   describe 'GET /hotels/:id' do
-    before { get "/hotels/#{hotel_id}" }
+    before { get "/hotels/#{hotel_id}", params: {}, headers: headers }
 
     context 'when the record exists' do
       it 'returns the hotel' do
@@ -54,10 +57,10 @@ RSpec.describe 'Hotels API', type: :request do
   # Test suite for POST /hotels
   describe 'POST /hotels' do
     # valid payload
-    let(:valid_attributes) { { title: 'Sun Hotel', created_by: '1' } }
+    let(:valid_attributes) { { title: 'Sun Hotel', created_by: user.id.to_s }.to_json }
 
     context 'when the request is valid' do
-      before { post '/hotels', params: valid_attributes }
+      before { post '/hotels', params: valid_attributes, headers: headers }
 
       it 'creates a hotel' do
         expect(json['title']).to eq('Sun Hotel')
@@ -69,7 +72,8 @@ RSpec.describe 'Hotels API', type: :request do
     end
 
     context 'when the request is invalid' do
-      before { post '/hotels', params: { title: 'Foobar' } }
+      let(:invalid_attributes) { { title: nil }.to_json }
+      before { post '/hotels', params: invalid_attributes, headers: headers }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -77,17 +81,17 @@ RSpec.describe 'Hotels API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match(/Validation failed: Created by can't be blank/)
+          .to match(/Validation failed: Title can't be blank/)
       end
     end
   end
 
   # Test suite for PUT /hotels/:id
   describe 'PUT /hotels/:id' do
-    let(:valid_attributes) { { title: 'Hotel King' } }
+    let(:valid_attributes) { { title: 'Hotel King' }.to_json }
 
     context 'when the record exists' do
-      before { put "/hotels/#{hotel_id}", params: valid_attributes }
+      before { put "/hotels/#{hotel_id}", params: valid_attributes, headers: headers }
 
       it 'updates the record' do
         expect(response.body).to be_empty
@@ -101,7 +105,7 @@ RSpec.describe 'Hotels API', type: :request do
 
   # Test suite for DELETE /hotels/:id
   describe 'DELETE /hotels/:id' do
-    before { delete "/hotels/#{hotel_id}" }
+    before { delete "/hotels/#{hotel_id}", params: {}, headers: headers }
 
     it 'returns status code 204' do
       expect(response).to have_http_status(204)

@@ -8,10 +8,11 @@ RSpec.describe 'Bookings API' do
   let(:hotel_id) { hotel.id }
   let(:user_id) { user.id }
   let(:id) { bookings.first.id }
+  let(:headers) { valid_headers }
 
   # Test suite for GET /hotels/:hotel_id/bookings
   describe 'GET /hotels/:hotel_id/bookings' do
-    before { get "/hotels/#{hotel_id}/bookings" }
+    before { get "/hotels/#{hotel_id}/bookings", params: {}, headers: headers }
 
     context 'when hotel exists' do
       it 'returns status code 200' do
@@ -38,7 +39,7 @@ RSpec.describe 'Bookings API' do
 
   # Test suite for GET /hotels/:hotel_id/bookings/:id
   describe 'GET /hotels/:hotel_id/bookings/:id' do
-    before { get "/hotels/#{hotel_id}/bookings/#{id}" }
+    before { get "/hotels/#{hotel_id}/bookings/#{id}", params: {}, headers: headers }
 
     context 'when hotel booking exists' do
       it 'returns status code 200' do
@@ -65,10 +66,10 @@ RSpec.describe 'Bookings API' do
 
   # Test suite for PUT /hotels/:hotel_id/bookings
   describe 'POST /hotels/:hotel_id/bookings' do
-    let(:valid_attributes) { { user_id: user_id, booking_reference: 'Ref:1234', payment_status: false } }
+    let(:valid_attributes) { { user_id: user_id, booking_reference: 'Ref:1234', payment_status: false }.to_json }
 
     context 'when request attributes are valid' do
-      before { post "/hotels/#{hotel_id}/bookings", params: valid_attributes }
+      before { post "/hotels/#{hotel_id}/bookings", params: valid_attributes, headers: headers }
 
       it 'returns status code 201' do
         expect(response).to have_http_status(201)
@@ -76,7 +77,7 @@ RSpec.describe 'Bookings API' do
     end
 
     context 'when an invalid request' do
-      before { post "/hotels/#{hotel_id}/bookings", params: {} }
+      before { post "/hotels/#{hotel_id}/bookings", params: {}, headers: headers }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -90,9 +91,9 @@ RSpec.describe 'Bookings API' do
 
   # Test suite for PUT /hotels/:hotel_id/bookings/:id
   describe 'PUT /hotels/:hotel_id/bookings/:id' do
-    let(:valid_attributes) { {  payment_status: true } }
+    let(:valid_attributes) { {  payment_status: true }.to_json }
 
-    before { put "/hotels/#{hotel_id}/bookings/#{id}", params: valid_attributes }
+    before { put "/hotels/#{hotel_id}/bookings/#{id}", params: valid_attributes, headers: headers }
 
     context 'when booking exists' do
       it 'returns status code 204' do
@@ -120,7 +121,7 @@ RSpec.describe 'Bookings API' do
 
   # Test suite for DELETE /hotels/:id
   describe 'DELETE /hotels/:id' do
-    before { delete "/hotels/#{hotel_id}/bookings/#{id}" }
+    before { delete "/hotels/#{hotel_id}/bookings/#{id}", params: {}, headers: headers }
 
     it 'returns status code 204' do
       expect(response).to have_http_status(204)

@@ -3,13 +3,15 @@ class HotelsController < ApplicationController
 
   # GET /hotels
   def index
-    @hotels = Hotel.all
+    @hotels = @current_user.hotels
     json_response(@hotels)
   end
 
   # POST /hotels
   def create
-    @hotel = Hotel.create!(hotel_params)
+    @hotel = Hotel.new(hotel_params)
+    @hotel.created_by = current_user.id.to_s
+    @hotel.save!
     json_response(@hotel, :created)
   end
 
@@ -34,7 +36,7 @@ class HotelsController < ApplicationController
 
   def hotel_params
     # whitelist params
-    params.permit(:title, :created_by)
+    params.permit(:title)
   end
 
   def set_hotel
