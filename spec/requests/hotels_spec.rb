@@ -5,13 +5,15 @@ RSpec.describe 'Hotels API', type: :request do
   # initialize test data
   let!(:user) { create(:user) }
   let!(:hotels) { create_list(:hotel, 10, created_by: user.id) }
-  let(:hotel_id) { hotels.first.id }
-  let!(:booking) { create_list(:booking, 10, user_id: user.id, hotel_id: hotel_id) }
+  let!(:hotel_id) { hotels.first.id }
+
   # authorize request
   let(:headers) { valid_headers }
 
   # Test suite for GET /hotels
   describe 'GET /hotels' do
+    let!(:@current_user) { user }
+    let!(:booking) { create_list(:booking, 10, user_id: user.id, hotel_id: hotel_id) }
     # make HTTP get request before each example
     before { get '/hotels', params: {}, headers: headers }
 
